@@ -1,26 +1,80 @@
+/* ---------------------------------------------------------------------------
+   globals.css — the one stylesheet for the whole site.
+
+   Tailwind v4 is "CSS-first": instead of a tailwind.config.js file, you
+   configure it right here in CSS.
+     • `@import "tailwindcss";`  pulls in all of Tailwind's utility classes.
+     • `@theme { ... }`          defines your design tokens (colours, fonts).
+                                 Every token becomes a utility class — e.g.
+                                 `--color-accent` lets you write `text-accent`,
+                                 `bg-accent`, `border-accent`, etc.
+
+   We only ship a dark theme (the site is dark by design, like the reference),
+   so there's no light-mode logic to reason about.
+--------------------------------------------------------------------------- */
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* Surfaces — from the page background up to raised cards. Warm near-black,
+     matching Preflight's own app palette. */
+  --color-page: #191712;        /* page background            → bg-page      */
+  --color-surface: #221f19;     /* cards / panels             → bg-surface   */
+  --color-surface-2: #2b271f;   /* nested / hovered surfaces  → bg-surface-2 */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Text — three levels of emphasis. */
+  --color-fg: #f2efe6;          /* primary text     → text-fg     */
+  --color-muted: #b9b4a7;       /* secondary text   → text-muted  */
+  --color-faint: #8b867a;       /* hints / captions → text-faint  */
+
+  /* Lines / borders. */
+  --color-line: #35312a;        /* hairline border  → border-line        */
+  --color-line-strong: #4a463b; /* stronger border  → border-line-strong  */
+
+  /* Accent — Preflight's sky blue, used for links, highlights, the CTA. */
+  --color-accent: #85b7eb;      /* → text-accent / bg-accent */
+  --color-accent-strong: #b3d4f5;
+
+  /* Verdict colours — reused in the terminal mock so it looks like the real
+     CLI output. Each maps to one of Preflight's verdicts. */
+  --color-safe: #9fd15a;        /* safe                */
+  --color-cve: #f0938c;         /* has a CVE           */
+  --color-danger: #ef6b63;      /* malware / critical  */
+  --color-pinned: #f0b429;      /* framework-pinned    */
+  --color-stale: #c9a6f0;       /* stale               */
+
+  /* Fonts — the actual font files are loaded in layout.tsx and exposed as
+     CSS variables; here we just point Tailwind's font utilities at them. */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Base document styles. `@layer base` means these are low-priority defaults
+   that any Tailwind utility class can override. */
+@layer base {
+  html {
+    color-scheme: dark;              /* native form controls / scrollbars go dark */
+    scroll-behavior: smooth;         /* anchor links glide instead of jumping     */
+    scroll-padding-top: 5rem;        /* ...and stop below the sticky nav bar       */
+  }
+  body {
+    background-color: var(--color-page);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* A soft radial "glow" we place behind the hero for depth. It's just a
+   reusable class so the JSX stays clean. */
+.hero-glow {
+  background:
+    radial-gradient(60rem 40rem at 50% -10%, rgba(133, 183, 235, 0.14), transparent 70%),
+    radial-gradient(40rem 30rem at 80% 10%, rgba(159, 209, 90, 0.06), transparent 70%);
+}
+
+/* A faint dotted grid, also for the hero backdrop. */
+.grid-bg {
+  background-image: radial-gradient(rgba(242, 239, 230, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
