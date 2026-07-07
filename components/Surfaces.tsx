@@ -20,11 +20,11 @@ export function Surfaces() {
           <TerminalSquare size={22} className="text-accent" />
           <h3 className="mt-4 text-lg font-semibold text-fg">Run it locally</h3>
           <p className="mt-2 flex-1 text-muted">
-            One command, a colour-coded verdict table, and a non-zero exit code when something&apos;s
-            wrong — so it drops into any script.
+            Clone the repo, then one command: a colour-coded verdict table and a non-zero exit
+            code when something&apos;s wrong — so it drops into any script.
           </p>
           <code className="mt-4 block overflow-x-auto rounded-lg border border-line bg-page px-3 py-2 font-mono text-xs text-muted">
-            npx @preflight/cli check
+            npm run check -- path/to/package.json
           </code>
         </div>
 

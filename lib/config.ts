@@ -14,5 +14,7 @@ export const site = {
   dashboardUrl: "https://preflight-web.vercel.app",
 
   // The command shown in the hero / CTA. Kept here so it's easy to change.
-  installCommand: "npx @preflight/cli check package.json",
+  // Honest form: the CLI isn't published to npm yet, so we show the clone-and-run path.
+  // When it ships to npm, swap this back to: npx @preflight/cli check package.json
+  installCommand: "git clone https://github.com/Ali0600/preflight && cd preflight && npm i && npm run check",
 } as const;
