@@ -4,7 +4,7 @@
 
 import { ArrowUpRight } from "lucide-react";
 import { GithubIcon } from "./icons";
-import { Section, CtaLink } from "./ui";
+import { Section, Button } from "./ui";
 import { CommandLine } from "./CommandLine";
 import { site } from "@/lib/config";
 
@@ -26,12 +26,12 @@ export function CTA() {
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <CtaLink href={site.githubUrl} external>
+          <Button href={site.githubUrl} external>
             <GithubIcon size={16} /> Star on GitHub
-          </CtaLink>
-          <CtaLink href={site.dashboardUrl} variant="secondary" external>
+          </Button>
+          <Button href={site.dashboardUrl} variant="secondary" external>
             Try the dashboard <ArrowUpRight size={16} />
-          </CtaLink>
+          </Button>
         </div>
       </div>
     </Section>
