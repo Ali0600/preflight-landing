@@ -3,7 +3,7 @@
 
 import { ArrowRight } from "lucide-react";
 import { GithubIcon } from "./icons";
-import { Container, CtaLink } from "./ui";
+import { Container, Button } from "./ui";
 import { CommandLine } from "./CommandLine";
 import { TerminalMock } from "./TerminalMock";
 import { site } from "@/lib/config";
@@ -41,12 +41,12 @@ export function Hero() {
 
             {/* Buttons */}
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <CtaLink href="#get-started">
+              <Button href="#get-started">
                 Get started <ArrowRight size={16} />
-              </CtaLink>
-              <CtaLink href={site.githubUrl} variant="secondary" external>
+              </Button>
+              <Button href={site.githubUrl} variant="secondary" external>
                 <GithubIcon size={16} /> View on GitHub
-              </CtaLink>
+              </Button>
             </div>
 
             {/* The install command, copy-able. `max-w-md` keeps it tidy. */}
