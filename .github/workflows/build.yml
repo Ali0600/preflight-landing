@@ -1,0 +1,114 @@
+# Build check — the site had no CI that proved it still compiles.
+#
+# Runs lint + a production Next build on every push to main and every PR, plus a
+# weekly heartbeat (catches runner/toolchain drift the pinned lockfile can't) and
+# manual dispatch.
+#
+# On a failed main/scheduled run this opens ONE issue labeled `build-failure`,
+# which the local self-healing pipeline (Ali0600/self-healing-script) polls: it
+# diagnoses the break, fixes it in a dedicated clone, re-verifies independently,
+# and opens a PR. A green run closes the issue again.
+#
+# The alert/close steps deliberately skip `pull_request` events — a broken PR is
+# the contributor's problem, not a signal that main is broken, and pointing the
+# healer at main for a PR-only failure would send it chasing a ghost.
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '0 7 * * 1' # Mondays 07:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write # open/close the build-failure alert issue
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Lint and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # A silent build break is invisible until someone opens the site; surface
+      # it as ONE deduplicated issue (comment on the open one rather than spam).
+      - name: Alert on failure
+        if: failure() && github.event_name != 'pull_request'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = `The site failed to lint/build on ${new Date().toISOString()}.\n\nRun: ${run}`;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'build-failure',
+            });
+            if (open.length) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open[0].number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: 'Site build failed',
+                body,
+                labels: ['build-failure'],
+              });
+            }
+
+      # Completes the loop: a healthy build closes any open alert issue, so a
+      # break that gets fixed (by hand or by the healer) ends the cycle without
+      # human bookkeeping.
+      - name: Close recovery issues
+        if: success() && github.event_name != 'pull_request'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'build-failure',
+            });
+            for (const issue of open) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `Build succeeded on ${new Date().toISOString()} — auto-closing.`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+              });
+            }
