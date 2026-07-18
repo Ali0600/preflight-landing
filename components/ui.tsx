@@ -56,10 +56,10 @@ export function SectionHeading({
   );
 }
 
-// CtaLink: our button. `variant="primary"` is the filled sky-blue button;
+// Button: our call-to-action button. `variant="primary"` is the filled sky-blue button;
 // `variant="secondary"` is the outlined one. It renders a normal link, so it
 // works for both on-page anchors (#get-started) and external URLs (GitHub).
-export function CtaLink({
+export function Button({
   href,
   variant = "primary",
   children,

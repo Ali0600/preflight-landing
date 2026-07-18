@@ -6,7 +6,7 @@
 
 import { PlaneTakeoff } from "lucide-react";
 import { GithubIcon } from "./icons";
-import { Container, CtaLink } from "./ui";
+import { Container, Button } from "./ui";
 import { site } from "@/lib/config";
 
 // The in-page anchor links. Each href points at a section `id` we set later.
@@ -50,7 +50,7 @@ export function Nav() {
           >
             <GithubIcon size={20} />
           </a>
-          <CtaLink href="#get-started">Get started</CtaLink>
+          <Button href="#get-started">Get started</Button>
         </div>
       </Container>
     </header>
