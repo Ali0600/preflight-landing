@@ -17,7 +17,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: Ali0600/preflight@v1
+        with:
+          persist-credentials: false
+      - uses: Ali0600/preflight@abce9bea9e1adbf2633a46f230c3cbeed379f901 # v1
         with:
           # repo mode when run manually; PR mode (default) on pull requests
           mode: ${{ github.event_name == 'workflow_dispatch' && 'repo' || 'pr' }}
